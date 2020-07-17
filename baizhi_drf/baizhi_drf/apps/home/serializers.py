@@ -12,4 +12,4 @@ class BnnerModelSerializer(ModelSerializer):
 class NavModelSerializer(ModelSerializer):
     class Meta:
         model = Navigation
-        fields = ('title','link','position')
+        fields = ('title','link','position','is_site')

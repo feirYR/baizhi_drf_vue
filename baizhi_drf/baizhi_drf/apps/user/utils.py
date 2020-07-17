@@ -13,13 +13,21 @@ def jwt_response_payload_handler(token, user=None, request=None):
     }
 
 
+# def check_user(account):
+#     try:
+#         user = UserInfo.objects.filter(Q(username=account) | Q(phone=account))[0]
+#     except UserInfo.DoesNotExist:
+#        return None
+#     else:
+#        return user
+
 def check_user(account):
-    try:
-        user = UserInfo.objects.filter(Q(username=account) | Q(phone=account))[0]
-    except UserInfo.DoesNotExist:
-       return None
-    else:
-       return user
+    user = UserInfo.objects.filter(Q(username=account) | Q(phone=account))[0]
+    if user:
+        return user
+    return None
+
+
 
 
 class UserAuthModelBackend(ModelBackend):

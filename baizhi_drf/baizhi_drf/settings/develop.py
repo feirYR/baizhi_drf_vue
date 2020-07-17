@@ -17,7 +17,6 @@ import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -27,13 +26,15 @@ SECRET_KEY = 'bhzfo^c&rvfsh*#ac6#iyi3^a$9)hl_t40dx(7%f)4&8*tar)i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    "api.baizhishop.com",
+    '127.0.0.1',
+]
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'home',
     'user',
+    'course',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'baizhi_drf.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -85,9 +86,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'baizhi_db',
+        # 'USER': 'root',
+        # 'PASSWORD':'123456',
+        # 'HOST':'localhost',
+        # 'PORT':3306,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -107,7 +113,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -121,30 +126,54 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
-MEDIA_URL='/media/'
-MEDIA_ROOT=os.path.join(BASE_DIR,'media')
-sys.path.insert(0,os.path.join(BASE_DIR,'apps'))
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 AUTH_USER_MODEL = 'user.UserInfo'
 
-REST_FRAMEWORK={
-    "EXCEPTION_HANDLER" : "utils.exceptions.my_exception_handler",
-    'DEFAULT_AUTHENTICATION_CLASSES':[
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "utils.exceptions.my_exception_handler",
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication'
     ]
 }
-JWT_AUTH={
-   'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
-    'JWT_RESPONSE_PAYLOAD_HANDLER':'user.utils.jwt_response_payload_handler'
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler'
 }
 AUTHENTICATION_BACKENDS = ['user.utils.UserAuthModelBackend']
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",  # Redis缓存入口，其中使用DefaultClient操作缓存
+        "LOCATION": "redis://192.168.42.133:7000/0",  # ip:port/db_index
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"  # 操作缓存的对象
+        }
+    },
+    "sms": {
+        "BACKEND": "django_redis.cache.RedisCache",  # Redis缓存入口，其中使用DefaultClient操作缓存
+        "LOCATION": "redis://192.168.42.133:7000/1",  # ip:port/db_index
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"  # 操作缓存的对象
+        }
+    },
+    "cart": {
+        "BACKEND": "django_redis.cache.RedisCache",  # Redis缓存入口，其中使用DefaultClient操作缓存
+        "LOCATION": "redis://192.168.42.133:7000/2",  # ip:port/db_index
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"  # 操作缓存的对象
+        }
+    }
+}
+
 # 项目的日志配置
 LOGGING = {
     # 版本

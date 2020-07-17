@@ -9,3 +9,4 @@ class UserInfo(AbstractUser):
         db_table='bz_user'
         verbose_name='用户表'
         verbose_name_plural=verbose_name
+

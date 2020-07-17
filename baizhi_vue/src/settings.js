@@ -1,3 +1,3 @@
 export default {
-  'HOST':'http://drf.baizhi.com:8000'
+  "HOST":"http://api.baizhishop.com:8000/"
 }

@@ -6,21 +6,26 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left">
-                    <li v-for="(header,index) in headers" :key="index" v-if=" header.position == 0"><span>{{header.title}}</span>
+                    <li v-for="(header,index) in headers" :key="index" v-if=" header.position == 0">
+                        <span v-if="header.is_site"><a :href="header.link">{{header.title}}</a></span>
+                        <span v-else><router-link :to="header.link">{{header.title}}</router-link></span>
+
                     </li>
                 </ul>
                 <div class="login-bar full-right" v-if="token">
-                    <div class="shop-cart full-left">
+                    <div class="shop-cart full-left" >
                         <img src="/static/image/" alt="">
-                        <span><router-link to="/cart">购物车</router-link></span>
+<!--                        <span><router-link to="/cart" >{{len}}&nbsp&nbsp购物车</router-link></span>-->
+                        <span><router-link to="/cart" >{{this.$store.state.cart_length}}&nbsp&nbsp购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
                         欢迎：<span style="color: blueviolet">{{username}}</span>&nbsp&nbsp
                         <router-link to="/login">个人中心</router-link>
                          |&nbsp;
-                        <router-link to="/login">注销</router-link>
-                        &nbsp;|&nbsp;
-                        <span>注册</span>
+                        <router-link to="/login">退出登陆</router-link>
+                         |&nbsp;
+                        <a href="javascript:;" @click="logout">注销账号</a>
+
                     </div>
                 </div>
                 <div class="login-bar full-right" v-else>
@@ -31,7 +36,7 @@
                     <div class="login-box full-left">
                         <router-link to="/login">登陆</router-link>
                          |&nbsp;
-                        <span>注册</span>
+                        <router-link to="/register">注册</router-link>
                     </div>
                 </div>
             </div>
@@ -42,11 +47,14 @@
 <script>
     export default {
         name: "headers",
+        props:['len'],
         data() {
             return {
                 headers: [],
                 token: '',
-                username: ''
+                username: '',
+                cart_len:''
+
             }
         },
         methods: {
@@ -55,7 +63,7 @@
                     url: 'http://127.0.0.1:8000/home/nav/',
                     method: 'get',
                 }).then(re => {
-                    console.log('查询页头成功', re.data)
+                    // console.log('查询页头成功', re.data)
                     this.headers = re.data
 
                 }).catch(error => {
@@ -66,11 +74,30 @@
                 this.token = localStorage.token || sessionStorage.token
                 this.username = localStorage.username || sessionStorage.username
                 console.log(this.username)
+            },
+            logout(){
+                this.$axios({
+                    url:'http://127.0.0.1:8000/user/logout/'+`${this.username}`,
+                    method: 'delete'
+                }).then(re=>{
+                    localStorage.removeItem('username') || sessionStorage.removeItem('username')
+                    localStorage.removeItem('token')    ||   sessionStorage.removeItem('token')
+                    this.$message({
+                        message: '账号已注销',
+                        type: 'success'
+                    })
+                    this.$router.push('/login')
+                }).catch(error=>{
+                    this.$message.error('注销失败')
+                })
             }
         },
         created() {
             this.get_user()
             this.get_nav()
+            console.log(this.props)
+            console.log(this.$store.state.cart_length)
+            this.$store.commit('add_goods',len)
         }
     }
 </script>

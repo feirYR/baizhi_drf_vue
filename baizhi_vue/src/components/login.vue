@@ -24,7 +24,7 @@
                     </div>
                     <button class="login_btn btn btn-primary" @click="get_captche">登录</button>
                     <p class="go_login">没有账号
-                        <router-link to="/user/register/">立即注册</router-link>
+                        <router-link to="/register">立即注册</router-link>
                     </p>
                 </div>
                 <div class="inp" v-show="">
@@ -33,7 +33,7 @@
                     <button id="get_code" class="btn btn-primary">获取验证码</button>
                     <button class="login_btn">登录</button>
                     <span class="go_login">没有账号
-                    <router-link to="/user/register/">立即注册</router-link>
+                    <router-link to="/register">立即注册</router-link>
                 </span>
                 </div>
             </div>
@@ -60,8 +60,8 @@
                         username: this.username
                     },
                 }).then(re => {
-                    console.log(re.data.status)
-                    let data = JSON.parse(re.data.status)
+                    console.log(re.data)
+                    let data = JSON.parse(re.data.results)
                     console.log(data)
                     initGeetest({
                         gt: data.gt,
@@ -71,6 +71,7 @@
                         new_captcha: data.new_captcha
                     }, this.handlerPopup);
                 }).catch(error => {
+                    console.log(2222222)
                     this.$message.error('用户名或密码错误')
                 })
 
@@ -83,14 +84,18 @@
                         url: 'http://127.0.0.1:8000/user/captche/',
                         method: 'post',
                         data: {
+                            username:self.username,
                             geetest_challenge: validate.geetest_challenge,
                             geetest_validate: validate.geetest_validate,
                             geetest_seccode: validate.geetest_seccode
                         }
                     }).then(re=>{
+                        console.log(re.data);
                         if (re.data.status){
                             console.log('验证成功')
+                            console.log(re.data.status)
                             self.login()
+                            // self.$router.push('/')
                         }else {
                             self.$message.error('验证失败')
                         }
@@ -119,17 +124,22 @@
                     if (this.remeber_me) {
                         localStorage.username = this.username
                         localStorage.token = re.data['token']
+                        localStorage.user_id = re.data['user_id']
                         sessionStorage.removeItem('username')
                         sessionStorage.removeItem('token')
+                        sessionStorage.removeItem('user_id')
                     } else {
                         sessionStorage.username = this.username
                         sessionStorage.token = re.data['token']
+                        sessionStorage.user_id = re.data['user_id']
                         localStorage.removeItem('username')
                         localStorage.removeItem('token')
+                        localStorage.removeItem('user_id')
                     }
 
                     this.$router.push('/')
                 }).catch(error => {
+                    console.log(11111111)
                     this.$message.error('用户名或密码错误')
 
                 })

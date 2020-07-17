@@ -31,7 +31,7 @@
             url:'http://127.0.0.1:8000/home/nav/',
             method:'get',
           }).then(re=>{
-            console.log('查询页头成功',re.data)
+            // console.log('查询页尾成功',re.data)
             this.foots = re.data
 
           }).catch(error=>{
