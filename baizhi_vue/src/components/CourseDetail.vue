@@ -4,18 +4,29 @@
         <div class="main">
             <div class="course-info">
                 <div class="wrap-left">
+                    <videoPlayer class="video-player vjs-custom-skin"
+                                 ref="videoPlayer"
+                                 :playsinline="true"
+                                 :options="playerOptions"
+                                 @play="onPlayerPlay($event)"
+                                 @pause="onPlayerPause($event)">
 
+                    </videoPlayer>
                 </div>
                 <div class="wrap-right">
                     <h3 class="course-name">{{course.name}}</h3>
                     <p class="data">{{course.students}}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：{{course.lessons}}课时/89小时&nbsp;&nbsp;&nbsp;&nbsp;难度：{{course.level}}</p>
                     <div class="sale-time">
-                        <p class="sale-type">限时免费</p>
-                        <p class="expire">距离结束：仅剩 110天 13小时 33分 <span class="second">08</span> 秒</p>
+                        <p class="sale-type">{{course.discount_name}}</p>
+                        <p class="expire">距离结束：仅剩
+                            {{parseInt(course.active_time/(24*3600))}}天
+                            {{parseInt(course.active_time/3600%24)}}小时
+                            {{parseInt(course.active_time/60%60)}}分
+                            <span class="second">{{parseInt(course.active_time%60)}}</span> 秒</p>
                     </div>
                     <p class="course-price">
                         <span>活动价</span>
-                        <span class="discount">¥0.00</span>
+                        <span class="discount">¥{{course.final_price}}</span>
                         <span class="original">{{course.price}}</span>
                     </p>
                     <div class="buy">
@@ -32,23 +43,18 @@
                     <li :class="tabIndex==1?'active':''" @click="tabIndex=1">详情介绍</li>
                     <li :class="tabIndex==2?'active':''" @click="tabIndex=2">课程章节 <span :class="tabIndex!=2?'free':''">(试学)</span>
                     </li>
-                    <li :class="tabIndex==3?'active':''" @click="tabIndex=3">学生评论 (88)</li>
+                    <li :class="tabIndex==3?'active':''" @click="tabIndex=3">学生评论 (88)
+
+                    </li>
+
                     <li :class="tabIndex==4?'active':''" @click="tabIndex=4">常见问题</li>
                 </ul>
             </div>
             <div class="course-content">
                 <div class="course-tab-list">
-                    <div class="tab-item" v-if="tabIndex==1">
-                        <!--                        <p><img alt=""-->
-                        <!--                                src="./static/image/1111.jpg"-->
-                        <!--                                width="840"></p>-->
-                        <!--                        <p><img alt=""-->
-                        <!--                                src=""-->
-                        <!--                                width="840"></p>-->
-                        <!--                        <p><img alt=""-->
-                        <!--                                src=""-->
-                        <!--                                width="840"></p>-->
-                    </div>
+                                        <div class="tab-item" v-if="tabIndex==1">
+                                            <div>{{course.brief}}</div>
+                                        </div>
                     <div class="tab-item" v-if="tabIndex==2">
                         <div class="tab-item-title">
                             <p class="chapter">课程章节</p>
@@ -57,40 +63,46 @@
                         <div class="chapter-item" v-for="chapter in course.chapter_list">
                             <p class="chapter-title"><img src="" alt="">第{{chapter.chapter}}章·{{chapter.name}}</p>
                             <ul class="lesson-list">
-                                <li class="lesson-item" v-for="(lesson,index) in lesson_list"
-                                    v-if="lesson.chapter_id === chapter.id" :key="index">
+                                <li class="lesson-item" v-for="lesson in lesson_list"
+                                    v-if="lesson.chapter_id === chapter.id" :key="lesson.id">
                                     <!--                                    <p class="name" v-for="(lesson,index) in course.lesson_list" :key="index">-->
                                     <p class="name">
-                                        <span class="index">{{chapter.chapter}}-{{index+1}} </span>{{lesson.name}}
+                                        <span class="index">{{chapter.chapter}}-{{lesson.lesson}} </span>{{lesson.name}}
                                         <!--                                        <span class="index" v-for="lesson in lesson_list" :key="index">{{chapter.chapter}}-</span>-->
                                         <span class="free">免费</span>
                                     </p>
-                                    <p class="time">07:30 <img src=""></p>
+                                    <p class="time">07:30</p>
+<!--                                        <img src="./static/image/chapter-player.svg">-->
                                     <button class="try">立即试学</button>
                                 </li>
                             </ul>
                         </div>
-                        <div class="chapter-item">
-                            <p class="chapter-title"><img src="/static/image/1.svg" alt="">第1章·Vue简介</p>
-                            <ul class="lesson-list">
-                                <li class="lesson-item">
-                                    <p class="name"><span class="index">1-1</span> Vue基本介绍<span class="free">免费</span>
-                                    </p>
-                                    <p class="time">07:30 <img src="/static/image/chapter-player.svg"></p>
-                                    <button class="try">立即试学</button>
-                                </li>
-                                <li class="lesson-item">
-                                    <p class="name"><span class="index">1-2</span> Vue的双向绑定<span class="free">免费</span>
-                                    </p>
-                                    <p class="time">07:30 <img src="/static/image/chapter-player.svg"></p>
-                                    <button class="try">立即试学</button>
-                                </li>
-                            </ul>
-                        </div>
+                        <!--                        <div class="chapter-item">-->
+                        <!--                            <p class="chapter-title"><img src="/static/image/1.svg" alt="">第1章·Vue简介</p>-->
+                        <!--                            <ul class="lesson-list">-->
+                        <!--                                <li class="lesson-item">-->
+                        <!--                                    <p class="name"><span class="index">1-1</span> Vue基本介绍<span class="free">免费</span>-->
+                        <!--                                    </p>-->
+                        <!--                                    <p class="time">07:30 <img src="/static/image/chapter-player.svg"></p>-->
+                        <!--                                    <button class="try">立即试学</button>-->
+                        <!--                                </li>-->
+                        <!--                                <li class="lesson-item">-->
+                        <!--                                    <p class="name"><span class="index">1-2</span> Vue的双向绑定<span class="free">免费</span>-->
+                        <!--                                    </p>-->
+                        <!--                                    <p class="time">07:30 <img src="/static/image/chapter-player.svg"></p>-->
+                        <!--                                    <button class="try">立即试学</button>-->
+                        <!--                                </li>-->
+                        <!--                            </ul>-->
+                        <!--                        </div>-->
 
                     </div>
                     <div class="tab-item" v-if="tabIndex==3">
-                        用户评论
+                        用户评论 <input type="text" v-model="review"><button @click="commit_review">提交</button>
+                        <ul>
+<!--
+<!--                            <li v-for="(rev,index) in review_list" :key="index">{{index+1}}&#45;&#45;用户{{rev.username}}:&nbsp&nbsp{{rev.review}}</li>-->
+                            <li v-for="(rev,index) in review_list" :key="index">{{index+1}}:&nbsp&nbsp{{rev}}</li>
+                        </ul>
                     </div>
                     <div class="tab-item" v-if="tabIndex==4">
                         常见问题
@@ -120,66 +132,154 @@
 <script>
     import headers from "./common/headers";
     import foot from "./common/foot";
-    import banner from "./common/banner";
+    import {videoPlayer} from 'vue-video-player'
 
     export default {
         name: "CourseDetail",
         components: {
-            headers: headers,
-            foot: foot,
+            headers,
+            foot,
+            videoPlayer
         },
         data() {
             return {
                 tabIndex: '',
                 course_id: this.$route.params.id,
-                course: [],
+                course: '',
                 chapter_list: [],
                 lesson_list: [],
-                cart_length:''
+                cart_length: '',
+                username: sessionStorage.username || localStorage.username,
+                user_id: sessionStorage.user_id ||localStorage.user_id,
+                // review:localStorage.review ? localStorage.review:[],
+                review: '' ,
+                review_list:[],
+
+                playerOptions: {
+                    playbackRates: [0.7, 1.0, 1.5, 2.0], // 播放速度
+                    autoplay: false, //如果true,则自动播放
+                    muted: false, // 默认情况下将会消除任何音频。
+                    loop: false, // 循环播放
+                    preload: 'auto',  // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+                    language: 'zh-CN',
+                    aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+                    fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                    sources: [{ // 播放资源和资源格式
+                        type: "video/mp4",
+                        src: "http://img.ksbbs.com/asset/Mon_1703/05cacb4e02f9d9e.mp4" //你的视频地址（必填）
+                    }],
+                    poster: "../static/image/chapter-player.svg", //视频封面图
+                    width: document.documentElement.clientWidth, // 默认视频全屏时的最大宽度
+                    notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+                }
             }
         },
         created() {
             this.get_detail()
+            this.show_review()
+            // console.log(localStorage.msg)
         },
         methods: {
+            check_user() {
+                let token = localStorage.token || sessionStorage.token
+                if (token) {
+                    return token
+                } else {
+                    let self = this
+                    this.$confirm('请先登陆', {
+                        callback() {
+                            self.$router.push('/login')
+                        }
+                    })
+                }
+            },
             get_detail() {
+
                 this.$axios({
                     url: this.$settings.HOST + 'course/course_detail/' + `${this.course_id}`,
-                    method: 'get'
+                    method: 'get',
+
                 }).then(re => {
-                    console.log(re.data)
+                    // console.log(re.data)
                     this.chapter_list = re.data.chapter_list
                     this.lesson_list = re.data.lesson_list
                     this.course = re.data
-                    console.log(this.lesson_list)
+                    // console.log(this.lesson_list)
+                    // console.log(re.data)
+                    this.playerOptions.sources[0].src = re.data.course_vedio
+                    this.playerOptions.poster = re.data.course_img
+                    let timer = setInterval(() => {
+                        this.course.active_time--
+                    }, 1000)
                 }).catch(error => {
                     // this.$message.error(error)
                     this.$message.error('查询失败')
                 })
             },
-            get_capcher() {
 
-            },
             add_cart() {
                 console.log(sessionStorage.user_id)
+                let token = this.check_user()
                 this.$axios({
-                    url:'http://127.0.0.1:8000/cart/cart/',
+                    url: 'http://127.0.0.1:8000/cart/cart/',
                     method: 'post',
-                    data:{
-                        course_id:this.course_id,
-                        user_id: localStorage.user_id ||sessionStorage.user_id,
+                    headers: {
+                        'Authorization': 'jwt ' + token
                     },
-                }).then(re=>{
+                    data: {
+                        course_id: this.course_id,
+                        user_id: localStorage.user_id || sessionStorage.user_id,
+                    },
+                }).then(re => {
                     console.log(re.data)
                     console.log(re.data.cart_length)
                     this.cart_length = re.data.cart_length
-                    this.$store.commit('add_goods',re.data.cart_length)
-                }).catch(error=>{
+                    this.$store.commit('add_goods', re.data.cart_length)
+                }).catch(error => {
                     console.log(error)
                 })
 
+            },
+            commit_review(){
+               // this.review_list.push(this.review)
+               // localStorage.msg = JSON.stringify(this.review_list)
+                // localStorage.review = this.review_list
+                // this.review = ''
+                this.$axios({
+                    url:this.$settings.HOST+'course/review/',
+                    method:'post',
+                    data:{
+                        user_id : this.user_id,
+                        username :this.username,
+                        review : this.review,
+                        course_id : this.course_id
+                    }
+                }).then(re=>{
+                    this.$message.success(re.data.message)
+                    this.review = ''
+                    this.show_review()
+                }).catch(error=>{
+                    this.$message.error('提交失败')
+                })
+
+            },
+            show_review(){
+              this.$axios({
+                  url:this.$settings.HOST+'course/review/',
+                  method:'get',
+                  params:{
+                      course_id:this.course_id
+                  }
+              }).then(re=>{
+                  console.log(re.datareview)
+                  this.review_list = re.data.review
+
+              }).catch(error=>{
+                  this.$message.error('展示评论有误')
+              })
             }
-        }
+        },
+
 
     }
 </script>

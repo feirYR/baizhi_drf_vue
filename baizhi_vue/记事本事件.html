@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>记事本</title>
+</head>
+<body>
+<div id="info">
+    <input type="text" v-model="msg" >
+<!--    <input type="text" v-show="msg" value="改变msg">-->
+    <p>{{msg}}</p>
+    <button  @click="add_node">增加记录</button>
+    <button  @click="del_all">删除所有记录</button>
+    <ul>
+        <li v-for ="(value,index) in nodes" :key="index">-{{value}}-{{index}}<a href="javascript:;" @click="del_node(index)">删除</a></li>
+    </ul>
+<!--    <h3>共{{nodes.length}}条</h3>-->
+</div>
+<script src="src/main.js"></script>
+<script>
+    new Vue({
+        el:'#info',
+        data:{
+            ShowCss:true,
+            msg:'',
+            // nodes:localStorage.msgs?JSON.parse(localStorage.msgs):[],
+            nodes:JSON.parse(localStorage.msgs),
+            // nodes:localStorage.msgs?localStorage.msgs:[],
+        },
+        methods:{
+            chang_bg(){
+                this.ShowCss =! this.ShowCss;
+            },
+            add_node(){
+                if(this.msg){
+                    this.nodes.push(this.msg);
+                    localStorage.msgs=JSON.stringify(this.nodes)
+                    // localStorage.msgs=this.nodes
+                    this.msg=''
+                    // console.log(39,typeof localStorage.msgs,typeof this.nodes)
+                    console.log(40,typeof JSON.parse(localStorage.msgs))
+                }
+
+            },
+            del_node(index){
+                this.nodes.splice(index,1)
+
+            },
+            del_all(){
+                this.nodes=[]
+            }
+        }
+    })
+</script>
+</body>
+</html>

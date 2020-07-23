@@ -4,7 +4,7 @@
       <div class="cart_info">
         <div class="cart_title">
           <span class="text">我的购物车</span>
-          <span class="total">共4门课程</span>
+          <span class="total">共{{cart_length}}门课程</span>
         </div>
         <div class="cart_table">
           <div class="cart_head_row">
@@ -19,13 +19,15 @@
 <!--            <CartItem>{{course.course_img}}</CartItem>-->
 <!--            <CartItem>{{course.name}}</CartItem>-->
 
-            <CartItem v-for="(course,index) in courses" :course="course" :key="index" @del="show_cart"></CartItem>
+            <CartItem v-for="(course,index) in courses" :course="course" :key="index"
+                      @del="show_cart" @change_select="show_cart" @expire="show_cart"  @change="radio_all" :chang="all_radio"></CartItem>
           </div>
           <div class="cart_footer_row">
-            <span class="cart_select"><label> <el-checkbox v-model="select_all"></el-checkbox><span>全选</span></label></span>
+            <span class="cart_select"><label> <el-checkbox v-model="select_all" ></el-checkbox><span>全选</span></label></span>
             <span class="cart_delete"><i class="el-icon-delete"></i> <span>删除</span></span>
-            <span class="goto_pay">去结算</span>
-            <span class="cart_total">总计：¥0.0</span>
+<!--            <span class="goto_pay">去结算</span>-->
+              <router-link to="/order" class="goto_pay">去结算</router-link>
+            <span class="cart_total">总计：¥{{total_price}}</span>
           </div>
         </div>
       </div>
@@ -41,55 +43,130 @@
         name: "cats",
         data(){
           return{
-              select_all:true,
-              courses:[]
+              select_all:'',
+              courses:[],
+              total_price:0.00,
+              cart_length:0,
+              all_radio:''
+
           }
         },
         components:{
            headers,foot,CartItem
         },
         watch:{
-            select_all(){
+            'select_all'(){
                 this.select_all_cart()
+                // console.log(this.select_all,typeof this.select_all)
             }
         },
         methods:{
+            check_user(){
+             let token = localStorage.token || sessionStorage.token
+                if (token){
+                    return token
+                }else {
+                    let self = this
+                    this.$confirm('请先登陆',{
+                        callback(){
+                            self.$router.push('/login')
+                        }
+                    })
+                }
+            },
             show_cart(){
+                let token = this.check_user()
                 this.$axios({
                     url:'http://127.0.0.1:8000/cart/cart/',
                     method: 'get',
+                    headers:{
+                         'Authorization':'jwt ' + token
+                    },
                     params:{
                         user_id: localStorage.user_id ||sessionStorage.user_id,
                     },
                 }).then(re=>{
-                    // console.log(re.data['courses'],typeof re.data['courses'])
+                    // console.log(re.data)
                     this.courses = re.data['courses']
+                    this.cart_length = re.data.cart_length
                     this.$store.commit('add_goods',re.data.cart_length)
+                    this.get_total_price()
+                    this.radio_all()
+
+                    // this.select_all = select_all
+
                 }).catch(error=>{
                     console.log(error)
                 })
             },
             select_all_cart(){
-                this.$axios({
-                    url: this.$settings.HOST + 'cart/cart/',
-                    method: 'patch',
-                    data: {
-                        user_id: localStorage.user_id || sessionStorage.user_id,
-                        select: this.select_all
-                    }
-                }).then(re => {
-                    this.$message.success(re.data.message)
-                    // this.$message.success('成功')
-                    this.show_cart()
-                    this.select_all = re.data['select_all']
-                    console.log(re.data['select_all'])
-                }).catch(error => {
-                    this.$message.error('切换失败')
+
+                if (this.select_all === true){
+                    this.all_radio = true
+                }else{}
+
+                // let token = this.check_user()
+                // this.$axios({
+                //     url: this.$settings.HOST + 'cart/select_all/',
+                //     method: 'post',
+                //      headers:{
+                //          'Authorization':'jwt ' + token
+                //     },
+                //     data: {
+                //         user_id: localStorage.user_id || sessionStorage.user_id,
+                //         select_all: this.select_all
+                //         // select: this.select_all
+                //     }
+                // }).then(re => {
+                //     this.$message.success(re.data.message)
+                //     // this.$message.success('成功')
+                //     // this.show_cart()
+                //     this.select_all = re.data['select_all']
+                //     // console.log(re.data['select_all'])
+                // }).catch(error => {
+                //     this.$message.error(error.response.data.message)
+                // })
+            },
+            radio_all(){
+                // if(course_select){this.select_all = true}
+                // else {this.select_all = false}
+                // console.log(course_select)
+                // this.select_all = course_select
+                this.courses.forEach((course,key)=>{
+                    if(!course.select){
+                        this.select_all = false
+                        forEach.breakAfter
+                    }else {this.select_all = true}
                 })
+                // this.courses.every(function (course) {
+                //    if(course.select === false){
+                //        console.log(2222222)
+                //         this.select_all = false
+                //         return false
+                //     }else{
+                //         this.select_all = true
+                //         return true
+                //    }
+                //
+                // })
+            },
+            get_total_price(){
+                // data = this.show_cart()
+                // console.log(data);
+                let total= 0
+                this.courses.forEach((course,key)=>{
+                    if(course.select){
+                        total += parseFloat(course.final_expire_price)
+
+                    }
+                })
+                // console.log(total)
+                this.total_price = total
             }
         },
         created() {
             this.show_cart()
+            this.get_total_price()
         }
 
     }

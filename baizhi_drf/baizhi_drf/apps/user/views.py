@@ -89,7 +89,9 @@ class SendmessageAPIView(APIView):
         try:
             sms = SMSSend('ad7362d2880d845592b1fcd591399eb9')
             sms.send_msg(phone, code)
-            print(sms.send_msg(phone, code))
+            # from my_task.review.tasks import send_sms
+            # send_sms.delay(phone,code)
+            # print(sms.send_msg(phone, code))
             print('发送成功')
             return Response({'message': '发送验证码成功'}, status=200)
 

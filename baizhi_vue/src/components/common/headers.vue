@@ -47,7 +47,6 @@
 <script>
     export default {
         name: "headers",
-        props:['len'],
         data() {
             return {
                 headers: [],
@@ -97,7 +96,7 @@
             this.get_nav()
             console.log(this.props)
             console.log(this.$store.state.cart_length)
-            this.$store.commit('add_goods',len)
+            // this.$store.commit('add_goods',len)
         }
     }
 </script>

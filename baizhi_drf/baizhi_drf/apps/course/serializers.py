@@ -17,7 +17,8 @@ class  CourseModelSerializer(ModelSerializer):
     teacher = TeacherModelSerializer()
     class Meta:
         model = Course
-        fields = ['id','name','course_img','course_type','lessons','level','pub_lessons','students','price','lesson_list','teacher','chapter_list']
+        fields = ['id','name','course_img','course_type','lessons','level','pub_lessons','students','price','lesson_list',
+                  'teacher','chapter_list','course_vedio','final_price','discount_name','active_time','expire_list','brief']
         # fields = '__all__'
 
 class ChapterModelSerializer(ModelSerializer):

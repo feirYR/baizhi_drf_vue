@@ -137,7 +137,7 @@
                         localStorage.removeItem('user_id')
                     }
 
-                    this.$router.push('/')
+                    this.$router.push('/home')
                 }).catch(error => {
                     console.log(11111111)
                     this.$message.error('用户名或密码错误')

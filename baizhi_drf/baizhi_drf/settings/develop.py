@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -45,6 +45,12 @@ INSTALLED_APPS = [
     'home',
     'user',
     'course',
+    'order',
+    'payments',
+    # 'django_celery_results',
+    # 'ckeditor',
+    # 'ckeditor-uploader'
+
 ]
 
 MIDDLEWARE = [
@@ -124,7 +130,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -145,7 +151,7 @@ REST_FRAMEWORK = {
     ]
 }
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=30000),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler'
 }
 AUTHENTICATION_BACKENDS = ['user.utils.UserAuthModelBackend']
@@ -171,8 +177,47 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"  # 操作缓存的对象
         }
+    },
+    "review": {
+        "BACKEND": "django_redis.cache.RedisCache",  # Redis缓存入口，其中使用DefaultClient操作缓存
+        "LOCATION": "redis://192.168.42.133:7000/5",  # ip:port/db_index
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"  # 操作缓存的对象
+        }
     }
 }
+
+# 支付宝配置信息
+ALIAPY_CONFIG = {
+    # "gateway_url": "https://openapi.alipay.com/gateway.do?", # 真实支付宝网关地址
+    "gateway_url": "https://openapi.alipaydev.com/gateway.do?",  # 沙箱支付宝网关地址
+    "appid": "2016102200738366",
+    "app_notify_url": None,
+    "app_private_key_path": open(os.path.join(BASE_DIR, "apps/payments/keys/app_private_key.pem")).read(),
+    "alipay_public_key_path": open(os.path.join(BASE_DIR, "apps/payments/keys/app_private_key.pem")).read(),
+    "sign_type": "RSA2",
+    "debug": False,
+    # "return_url": "http://www.baizhistore.cn:8080/payments/result",  # 同步回调地址
+    "return_url": "http://localhost:8080/payments/result",  # 同步回调地址
+    "notify_url": "http://api.baizhishop.com:8000/payments/result",  # 异步结果通知
+}
+
+# KEDITOR_CONFIGS = {
+#     'default': {
+#         'toolbar': 'full',	# 展示哪些工具栏
+#         'height': 300,	# 编辑器的高度
+#         # 'width': 300,
+#     },
+# }
+# CKEDITOR_UPLOAD_PATH = "uploads/"
+
+#celery返回结果配置
+# CELERY_BROKER_URL = 'redis://192.168.42.133:7000/3'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_BACKEND = 'redis://192.168.42.133:7000/4'
+# # CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_TIMEZONE = 'Asia/Shanghai'
 
 # 项目的日志配置
 LOGGING = {
